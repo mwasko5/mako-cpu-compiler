@@ -7,6 +7,10 @@
 #define MAX_OPERATION_NAME_LEN 4 // ex: ADDI
 #define MAX_REGISTER_NAME_LEN 5 // ex: $zero
 
+#define NUM_NUMERICAL_OPERATIONS 2
+#define NUM_DATA_OPERATIONS 2
+#define NUM_IMMEDIATE_OPERATIONS 0
+
 // 2 types: numerical operations and data operations
 
 typedef struct {
@@ -33,12 +37,12 @@ typedef struct {
     const char *immediate;
 } ImmediateOperation;
 
-static NumericalOperation numerical_operation_table[] = {
+static char* numerical_operation_table[NUM_NUMERICAL_OPERATIONS] ={
     {"ADD"}, // "ADD $rd,$rs1,$rs2"
     {"SUB"} // "SUB $rd,$rs1,$rs2"
 };
 
-static DataOperation data_operation_table[] = {
+static char* data_operation_table[NUM_DATA_OPERATIONS] ={
     {"LW"}, // LW $rd,offset($rs1)
     {"SW"} // SW $rs2,offset($rs1)
 };
