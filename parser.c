@@ -69,6 +69,8 @@ char** separate_numerical_instruction_string(const char *str) {
     }
     rd_string[str_index - rd_start_index] = '\0';
 
+    str_index += 1; // move to the start of the next section
+
     char* rs1_string; int rs1_start_index = str_index;
     rs1_string = (char*)malloc((MAX_REGISTER_NAME_LEN + 1) * sizeof(char));
     while (str[str_index] != ',') { // $rs1
@@ -77,6 +79,8 @@ char** separate_numerical_instruction_string(const char *str) {
         str_index += 1;
     }
     rs1_string[str_index - rs1_start_index] = '\0';
+
+    str_index += 1; // move to the start of the next section
 
     char* rs2_string; int rs2_start_index = str_index;
     rs2_string = (char*)malloc((MAX_REGISTER_NAME_LEN + 1) * sizeof(char));
@@ -89,12 +93,11 @@ char** separate_numerical_instruction_string(const char *str) {
 
     array[0] = operator_string; array[1] = rd_string; array[2] = rs1_string; array[3] = rs2_string;
 
+    return array;
+    
     free(operator_string);
     free(rd_string);
     free(rs1_string);
     free(rs2_string);
-
-    return array;
-
     free(array);
 }

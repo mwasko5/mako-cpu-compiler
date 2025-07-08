@@ -21,7 +21,15 @@ int main(void) {
 
     // while (fgets(str, 80, ptr) != NULL) {
     if (fgets(read_line_str, 80, ptr) != NULL) {
-        puts(read_line_str);
+        // puts(read_line_str);
+        char** array = separate_numerical_instruction_string(read_line_str);
+
+        printf("operator: %s\n", array[0]);
+        printf("rd: %s\n", array[1]);
+        printf("rs1: %s\n", array[2]);
+        printf("rs2: %s\n", array[3]);
+
+        free(array);
     }
 
     fclose(ptr);
