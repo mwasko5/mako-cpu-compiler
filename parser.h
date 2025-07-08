@@ -1,7 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-int lookup_token(const char *str);
-int lookup_opcode(const char *str);
+char* lookup_numerical_instruction(const char *str);
+
+char** separate_numerical_instruction_string(const char *str);
 
 #endif

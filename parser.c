@@ -4,80 +4,97 @@
 
 #include "parser.h"
 
-int lookup_token(const char *str);
-int lookup_opcode(const char *str);
+#define MAX_OPERATION_NAME_LEN 4 // ex: ADDI
+#define MAX_REGISTER_NAME_LEN 5 // ex: $zero
+
+// 2 types: numerical operations and data operations
 
 typedef struct {
     const char *name;
-    int token;
-    int opcode;
-} TokenEntry;
 
-enum TokenType {
-    TOK_OPERATION = 1,
-    TOK_REGISTER = 2,
+    const char *field1;
+    const char *field2;
+    const char *field3;
+} NumericalOperation;
+
+typedef struct {
+    const char *name;
+
+    const char *field1;
+    const char *offset;
+    const char *field2;
+} DataOperation;
+
+typedef struct {
+    const char *name;
+
+    const char *field1;
+    const char *field2;
+    const char *immediate;
+} ImmediateOperation;
+
+static NumericalOperation numerical_operation_table[] = {
+    {"ADD"}, // "ADD $rd,$rs1,$rs2"
+    {"SUB"} // "SUB $rd,$rs1,$rs2"
+};
+
+static DataOperation data_operation_table[] = {
+    {"LW"}, // LW $rd,offset($rs1)
+    {"SW"} // SW $rs2,offset($rs1)
+};
+
+char** separate_numerical_instruction_string(const char *str) {
+    char** array = malloc(4 * sizeof(char*));
+
+    int str_index = 0;
+
+    char* operator_string;
+    operator_string = (char*)malloc((MAX_OPERATION_NAME_LEN + 1) * sizeof(char)); // n+1 size for "\0" operator
     
-    TOK_ERROR = -1
-};
+    while (str[str_index] != ' ') { // OPERATOR
+        operator_string[str_index] = str[str_index];
 
-static TokenEntry keyword_table[] = {
-    // OPERATION KEYWORDS //
-    // token field is the funct field
-    {"ADD", 0b0000000, 0b0110011},
-    {"SUB", 0b0110000, 0b0110011},
-    {"MUL", 0b0000001, 0b0110011},
-
-    // REGISTER KEYWORDS //
-    {"$zero", TOK_REGISTER, 0},
-    {"$ra", TOK_REGISTER, 1},
-    {"sp", TOK_REGISTER, 2},
-    {"gp", TOK_REGISTER, 3},
-    {"tp", TOK_REGISTER, 4},
-    {"t0", TOK_REGISTER, 5},
-    {"t1", TOK_REGISTER, 6},
-    {"t2", TOK_REGISTER, 7},
-    {"s0", TOK_REGISTER, 8},
-    {"s1", TOK_REGISTER, 9},
-    {"a0", TOK_REGISTER, 10},
-    {"a1", TOK_REGISTER, 11},
-    {"a2", TOK_REGISTER, 12},
-    {"a3", TOK_REGISTER, 13},
-    {"a4", TOK_REGISTER, 14},
-    {"a5", TOK_REGISTER, 15},
-    {"a6", TOK_REGISTER, 16},
-    {"a7", TOK_REGISTER, 17},
-    {"s2", TOK_REGISTER, 18},
-    {"s3", TOK_REGISTER, 19},
-    {"s4", TOK_REGISTER, 20},
-    {"s5", TOK_REGISTER, 21},
-    {"s6", TOK_REGISTER, 22},
-    {"s7", TOK_REGISTER, 23},
-    {"s8", TOK_REGISTER, 24},
-    {"s9", TOK_REGISTER, 25},
-    {"s10", TOK_REGISTER, 26},
-    {"s11", TOK_REGISTER, 27},
-    {"t3", TOK_REGISTER, 28},
-    {"t4", TOK_REGISTER, 29},
-    {"t5", TOK_REGISTER, 30},
-    {"t6", TOK_REGISTER, 31},
-
-    // ERROR HANDLING KEYWORDS //
-    {NULL, TOK_ERROR, -1}
-};
-
-
-int lookup_token(const char *str) {
-    for (int i = 0; keyword_table[i].name != NULL; i++) {
-        if (strcmp(str, keyword_table[i].name) == 0)
-            return keyword_table[i].token;
+        str_index += 1;
     }
-    return TOK_ERROR;  // default
-}
+    operator_string[str_index] = '\0';
 
-int lookup_opcode(const char *str) {
-    for (int i = 0; keyword_table[i].name != NULL; i++) {
-        if (strcmp(str, keyword_table[i].name) == 0)
-            return keyword_table[i].opcode;
+    str_index += 1; // move to the start of the next section
+
+    char* rd_string; int rd_start_index = str_index;
+    rd_string = (char*)malloc((MAX_REGISTER_NAME_LEN + 1) * sizeof(char));
+    while (str[str_index] != ',') { // $rd
+        rd_string[str_index - rd_start_index] = str[str_index];
+
+        str_index += 1;
     }
-    return TOK_ERROR;  // default
+    rd_string[str_index - rd_start_index] = '\0';
+
+    char* rs1_string; int rs1_start_index = str_index;
+    rs1_string = (char*)malloc((MAX_REGISTER_NAME_LEN + 1) * sizeof(char));
+    while (str[str_index] != ',') { // $rs1
+        rs1_string[str_index - rs1_start_index] = str[str_index];
+
+        str_index += 1;
+    }
+    rs1_string[str_index - rs1_start_index] = '\0';
+
+    char* rs2_string; int rs2_start_index = str_index;
+    rs2_string = (char*)malloc((MAX_REGISTER_NAME_LEN + 1) * sizeof(char));
+    while (str[str_index] != '\n') { // $rs2
+        rs2_string[str_index - rs2_start_index] = str[str_index];
+
+        str_index += 1;
+    }
+    rs2_string[str_index - rs2_start_index] = '\0';
+
+    array[0] = operator_string; array[1] = rd_string; array[2] = rs1_string; array[3] = rs2_string;
+
+    free(operator_string);
+    free(rd_string);
+    free(rs1_string);
+    free(rs2_string);
+
+    return array;
+
+    free(array);
 }

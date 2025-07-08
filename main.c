@@ -17,13 +17,11 @@ int main(void) {
         exit(1);
     }
 
-    char str[80];
-
-    printf("ADD token = %d\n", lookup_token("ADD"));
+    char read_line_str[80];
 
     // while (fgets(str, 80, ptr) != NULL) {
-    if (fgets(str, 80, ptr) != NULL) {
-        puts(str);
+    if (fgets(read_line_str, 80, ptr) != NULL) {
+        puts(read_line_str);
     }
 
     fclose(ptr);

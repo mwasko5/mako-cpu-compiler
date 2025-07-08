@@ -1,3 +1,2 @@
 ADD $rd,$rs1,$rs2
 SUB $rd,$rs1,$rs2
-MUL $rd,$rs1,$rs2
